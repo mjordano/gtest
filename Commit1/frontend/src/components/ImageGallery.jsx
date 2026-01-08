@@ -6,9 +6,13 @@
 import { useState, useEffect } from 'react';
 import { FiX, FiChevronLeft, FiChevronRight, FiZoomIn } from 'react-icons/fi';
 
+// Fallback placeholder image
+const FALLBACK_IMAGE = 'https://images.unsplash.com/photo-1578301978693-85fa9c0320b9?q=80&w=800&auto=format&fit=crop';
+
 export default function ImageGallery({ images = [] }) {
     const [lightboxOpen, setLightboxOpen] = useState(false);
     const [currentIndex, setCurrentIndex] = useState(0);
+    const [isZoomed, setIsZoomed] = useState(false);
 
     // Tastature navigacija
     useEffect(() => {
@@ -39,14 +43,22 @@ export default function ImageGallery({ images = [] }) {
     const openLightbox = (index) => {
         setCurrentIndex(index);
         setLightboxOpen(true);
+        setIsZoomed(false);
     };
 
     const handlePrev = () => {
         setCurrentIndex((prev) => (prev === 0 ? images.length - 1 : prev - 1));
+        setIsZoomed(false);
     };
 
     const handleNext = () => {
         setCurrentIndex((prev) => (prev === images.length - 1 ? 0 : prev + 1));
+        setIsZoomed(false);
+    };
+
+    const toggleZoom = (e) => {
+        e.stopPropagation();
+        setIsZoomed(!isZoomed);
     };
 
     if (!images || images.length === 0) {
@@ -68,10 +80,12 @@ export default function ImageGallery({ images = [] }) {
                         className="group relative aspect-square overflow-hidden bg-luxury-dark border border-luxury-gray hover:border-white transition-all duration-300"
                     >
                         <img
-                            src={image.thumbnail || image.slika}
+                            src={image.thumbnail || image.slika || FALLBACK_IMAGE}
                             alt={image.naslov || `Slika ${index + 1}`}
                             className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
                             loading="lazy"
+                            onError={(e) => { e.target.onerror = null; e.target.src = FALLBACK_IMAGE; }}
+                            referrerPolicy="no-referrer"
                         />
 
                         {/* Overlay */}
@@ -114,13 +128,15 @@ export default function ImageGallery({ images = [] }) {
 
                     {/* Slika */}
                     <div
-                        className="relative max-w-5xl max-h-[85vh] mx-auto"
-                        onClick={(e) => e.stopPropagation()}
+                        className={`relative max-w-5xl max-h-[85vh] mx-auto transition-transform duration-300 ${isZoomed ? 'scale-150 cursor-zoom-out' : 'cursor-zoom-in'}`}
+                        onClick={toggleZoom}
                     >
                         <img
-                            src={images[currentIndex]?.slika}
+                            src={images[currentIndex]?.slika || FALLBACK_IMAGE}
                             alt={images[currentIndex]?.naslov || `Slika ${currentIndex + 1}`}
                             className="max-w-full max-h-[85vh] object-contain animate-fade-in"
+                            onError={(e) => { e.target.onerror = null; e.target.src = FALLBACK_IMAGE; }}
+                            referrerPolicy="no-referrer"
                         />
 
                         {/* Info o slici */}

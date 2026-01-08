@@ -9,7 +9,7 @@ from app.database import get_db
 from app.models.lokacija import Lokacija
 from app.models.korisnik import Korisnik
 from app.schemas.lokacija import LokacijaCreate, LokacijaUpdate, LokacijaResponse
-from app.utils.dependencies import get_current_admin, get_current_staff
+from app.utils.dependencies import get_current_admin
 
 router = APIRouter(prefix="/api/lokacije", tags=["Lokacije"])
 
@@ -62,10 +62,10 @@ async def get_lokacija(
 async def create_lokacija(
     lokacija: LokacijaCreate,
     db: Session = Depends(get_db),
-    current_user: Korisnik = Depends(get_current_staff)
+    current_user: Korisnik = Depends(get_current_admin)
 ):
     """
-    Kreira novu lokaciju (samo osoblje/admin).
+    Kreira novu lokaciju (samo admin).
     """
     db_lokacija = Lokacija(**lokacija.model_dump())
     
@@ -81,10 +81,10 @@ async def update_lokacija(
     lokacija_id: int,
     lokacija_update: LokacijaUpdate,
     db: Session = Depends(get_db),
-    current_user: Korisnik = Depends(get_current_staff)
+    current_user: Korisnik = Depends(get_current_admin)
 ):
     """
-    Ažurira lokaciju (samo osoblje/admin).
+    Ažurira lokaciju (samo admin).
     """
     lokacija = db.query(Lokacija).filter(
         Lokacija.id_lokacija == lokacija_id

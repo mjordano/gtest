@@ -12,7 +12,7 @@ import InputField from '../components/ui/InputField';
 
 export default function Profile() {
     const navigate = useNavigate();
-    const { user, isAuthenticated, loading: authLoading } = useAuth();
+    const { user, isAuthenticated, loading: authLoading, updateUser } = useAuth();
 
     const [registrations, setRegistrations] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -29,7 +29,9 @@ export default function Profile() {
         grad: user?.grad || '',
         adresa: user?.adresa || ''
     });
+
     const [updatingProfile, setUpdatingProfile] = useState(false);
+    const [successModal, setSuccessModal] = useState(false);
 
     // QR modal
     const [qrModal, setQrModal] = useState({ open: false, data: null });
@@ -378,10 +380,10 @@ export default function Profile() {
                         onClick={async () => {
                             try {
                                 setUpdatingProfile(true);
-                                await korisniciAPI.update(user.id_korisnik, profileData);
-                                // Warning: Context user data won't update automatically without a refresh or context method
-                                // forcing a reload for now
-                                window.location.reload();
+                                const updatedUser = await korisniciAPI.update(user.id_korisnik, profileData);
+                                updateUser(updatedUser);
+                                setEditProfileModal(false);
+                                setSuccessModal(true);
                             } catch (err) {
                                 console.error(err);
                                 alert("Greška pri ažuriranju profila");
@@ -393,6 +395,26 @@ export default function Profile() {
                         Sačuvaj
                     </CustomButton>
                 </Modal.Footer>
+            </Modal>
+
+            {/* Success Modal */}
+            <Modal
+                isOpen={successModal}
+                onClose={() => setSuccessModal(false)}
+                title="Uspešna izmena"
+                size="sm"
+            >
+                <div className="text-center py-4">
+                    <div className="w-16 h-16 mx-auto mb-4 bg-green-900/50 rounded-full flex items-center justify-center">
+                        <FiCheck className="w-8 h-8 text-green-400" />
+                    </div>
+                    <p className="text-white text-lg mb-2">
+                        Uspešno ste izmenili podatke!
+                    </p>
+                    <CustomButton onClick={() => setSuccessModal(false)}>
+                        U redu
+                    </CustomButton>
+                </div>
             </Modal>
         </div>
     );

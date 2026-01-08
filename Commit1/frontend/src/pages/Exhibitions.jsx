@@ -3,7 +3,7 @@
  */
 import { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { FiSearch, FiMapPin, FiCalendar, FiFilter } from 'react-icons/fi';
+import { FiSearch, FiMapPin, FiFilter } from 'react-icons/fi';
 import { izlozbeAPI, lokacijeAPI } from '../services/api';
 import ExhibitionCard from '../components/ExhibitionCard';
 import InputField from '../components/ui/InputField';
@@ -19,7 +19,7 @@ export default function Exhibitions() {
     // Filters
     const [search, setSearch] = useState(searchParams.get('q') || '');
     const [city, setCity] = useState(searchParams.get('grad') || '');
-    const [sort, setSort] = useState('date_asc'); // date_asc, date_desc
+
 
     // Fetch filters data
     useEffect(() => {
@@ -41,23 +41,15 @@ export default function Exhibitions() {
         const fetchExhibitions = async () => {
             try {
                 setLoading(true);
-                // In real app, we would pass sort/filter params to API
-                // For now, we will filter client-side if API doesn't support all
                 const params = {
+                    objavljeno: true,
                     limit: 50
                 };
                 if (search) params.search = search;
                 if (city) params.grad = city;
 
                 const data = await izlozbeAPI.getAll(params);
-                let items = data.items || [];
-
-                // Sortiranje
-                if (sort === 'date_asc') {
-                    items.sort((a, b) => new Date(a.datum_pocetka) - new Date(b.datum_pocetka));
-                } else if (sort === 'date_desc') {
-                    items.sort((a, b) => new Date(b.datum_pocetka) - new Date(a.datum_pocetka));
-                }
+                const items = data.items || [];
 
                 setExhibitions(items);
             } catch (err) {
@@ -70,7 +62,7 @@ export default function Exhibitions() {
         // Debounce search
         const timeoutId = setTimeout(fetchExhibitions, 300);
         return () => clearTimeout(timeoutId);
-    }, [search, city, sort]);
+    }, [search, city]);
 
     // Update URL params
     useEffect(() => {
@@ -95,7 +87,7 @@ export default function Exhibitions() {
 
                 {/* Filters Bar */}
                 <div className="bg-luxury-dark/50 p-6 backdrop-blur-sm border border-luxury-gray/30 mb-12 animate-slide-up">
-                    <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                         {/* Search */}
                         <div className="md:col-span-2">
                             <div className="relative">
@@ -122,20 +114,6 @@ export default function Exhibitions() {
                                 {locations.map(loc => (
                                     <option key={loc} value={loc}>{loc}</option>
                                 ))}
-                            </select>
-                            <FiFilter className="absolute right-3 top-1/2 transform -translate-y-1/2 text-luxury-silver pointer-events-none" />
-                        </div>
-
-                        {/* Sort */}
-                        <div className="relative">
-                            <FiCalendar className="absolute left-3 top-1/2 transform -translate-y-1/2 text-luxury-silver" />
-                            <select
-                                value={sort}
-                                onChange={(e) => setSort(e.target.value)}
-                                className="w-full pl-10 pr-4 py-3 bg-luxury-black border border-luxury-gray text-white focus:border-white focus:outline-none appearance-none cursor-pointer"
-                            >
-                                <option value="date_asc">Najbliže</option>
-                                <option value="date_desc">Najdalje</option>
                             </select>
                             <FiFilter className="absolute right-3 top-1/2 transform -translate-y-1/2 text-luxury-silver pointer-events-none" />
                         </div>
