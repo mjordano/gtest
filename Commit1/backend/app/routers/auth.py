@@ -32,9 +32,9 @@ async def register(
     - **ime**: Ime korisnika
     - **prezime**: Prezime korisnika
     """
-    # Provera da li username već postoji
+    # Provera da li username već postoji (case-insensitive)
     existing_username = db.query(Korisnik).filter(
-        Korisnik.username == korisnik.username
+        Korisnik.username.ilike(korisnik.username)
     ).first()
     if existing_username:
         raise HTTPException(
@@ -42,9 +42,9 @@ async def register(
             detail=f"Korisničko ime '{korisnik.username}' je već zauzeto. Molimo odaberite drugo."
         )
     
-    # Provera da li email već postoji
+    # Provera da li email već postoji (case-insensitive)
     existing_email = db.query(Korisnik).filter(
-        Korisnik.email == korisnik.email
+        Korisnik.email.ilike(korisnik.email)
     ).first()
     if existing_email:
         raise HTTPException(
@@ -53,25 +53,35 @@ async def register(
         )
     
     # Kreiranje novog korisnika
-    hashed_password = get_password_hash(korisnik.lozinka)
-    db_korisnik = Korisnik(
-        username=korisnik.username,
-        email=korisnik.email,
-        lozinka=hashed_password,
-        ime=korisnik.ime,
-        prezime=korisnik.prezime,
-        telefon=korisnik.telefon,
-        profilna_slika=korisnik.profilna_slika,
-        aktivan=True,
-        super_korisnik=False,
-        datum_pridruzivanja=datetime.utcnow()
-    )
-    
-    db.add(db_korisnik)
-    db.commit()
-    db.refresh(db_korisnik)
-    
-    return db_korisnik
+    try:
+        hashed_password = get_password_hash(korisnik.lozinka)
+        db_korisnik = Korisnik(
+            username=korisnik.username,
+            email=korisnik.email,
+            lozinka=hashed_password,
+            ime=korisnik.ime,
+            prezime=korisnik.prezime,
+            telefon=korisnik.telefon,
+            profilna_slika=korisnik.profilna_slika,
+            aktivan=True,
+            super_korisnik=False,
+            datum_pridruzivanja=datetime.utcnow()
+        )
+        
+        db.add(db_korisnik)
+        db.commit()
+        db.refresh(db_korisnik)
+        
+        return db_korisnik
+        
+    except Exception as e:
+        db.rollback()
+        # For debugging purposes, exposing the error
+        print(f"Registration error: {str(e)}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Greška servera: {str(e)}"
+        )
 
 
 @router.post("/login", response_model=Token)

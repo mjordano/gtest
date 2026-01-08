@@ -86,7 +86,18 @@ export default function Register() {
         setLoading(true);
         setError(null);
 
-        const { lozinkaConfirm, ...registerData } = formData;
+        const { lozinkaConfirm, ...rawRegisterData } = formData;
+
+        // Trim inputs
+        const registerData = {
+            ...rawRegisterData,
+            username: rawRegisterData.username.trim(),
+            email: rawRegisterData.email.trim(),
+            ime: rawRegisterData.ime.trim(),
+            prezime: rawRegisterData.prezime.trim(),
+            telefon: rawRegisterData.telefon ? rawRegisterData.telefon.trim() : '',
+        };
+
         const result = await register(registerData);
 
         if (result.success) {

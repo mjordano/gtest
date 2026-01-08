@@ -97,13 +97,13 @@ export const izlozbeAPI = {
         return response.data;
     },
 
-    // Kreiranje izložbe (admin/osoblje)
+    // Kreiranje izložbe (admin)
     create: async (data) => {
         const response = await api.post('/izlozbe', data);
         return response.data;
     },
 
-    // Ažuriranje izložbe (admin/osoblje)
+    // Ažuriranje izložbe (admin)
     update: async (id, data) => {
         const response = await api.put(`/izlozbe/${id}`, data);
         return response.data;
@@ -188,7 +188,7 @@ export const slikeAPI = {
 // ==================== PRIJAVE API ====================
 
 export const prijaveAPI = {
-    // Lista svih prijava (admin/osoblje)
+    // Lista svih prijava (admin)
     getAll: async (params = {}) => {
         const response = await api.get('/prijave', { params });
         return response.data;

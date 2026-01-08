@@ -157,7 +157,7 @@ async def create_izlozba(
     current_user: Korisnik = Depends(get_current_admin)
 ):
     """
-    Kreira novu izložbu (samo osoblje/admin).
+    Kreira novu izložbu (samo admin).
     """
     # Provera da li lokacija postoji
     lokacija = db.query(Lokacija).filter(
@@ -213,7 +213,7 @@ async def update_izlozba(
     current_user: Korisnik = Depends(get_current_admin)
 ):
     """
-    Ažurira izložbu (samo osoblje/admin).
+    Ažurira izložbu (samo admin).
     """
     izlozba = db.query(Izlozba).filter(
         Izlozba.id_izlozba == izlozba_id

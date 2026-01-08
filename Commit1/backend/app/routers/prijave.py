@@ -28,7 +28,7 @@ async def list_prijave(
     current_user: Korisnik = Depends(get_current_admin)
 ):
     """
-    Lista svih prijava (samo osoblje/admin).
+    Lista svih prijava (samo admin).
     
     - **skip**: Broj preskočenih rezultata
     - **limit**: Maksimalni broj rezultata
@@ -73,7 +73,7 @@ async def get_prijava(
     """
     Vraća prijavu po ID-u.
     
-    Korisnik može videti samo svoje prijave, osoblje/admin sve.
+    Korisnik može videti samo svoje prijave, admin sve.
     """
     prijava = db.query(Prijava).options(
         joinedload(Prijava.izlozba).joinedload(Izlozba.lokacija)
@@ -196,7 +196,7 @@ async def validate_prijava(
     current_user: Korisnik = Depends(get_current_admin)
 ):
     """
-    Validira QR kod prijave (samo osoblje/admin).
+    Validira QR kod prijave (samo admin).
     
     Koristi se na ulazu u izložbu za proveru karata.
     """

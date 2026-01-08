@@ -99,7 +99,7 @@ async def create_slika(
     current_user: Korisnik = Depends(get_current_admin)
 ):
     """
-    Kreira novu sliku (samo osoblje/admin).
+    Kreira novu sliku (samo admin).
     
     Slika se čuva kao URL link, ne kao fajl.
     """
@@ -119,7 +119,7 @@ async def create_slika_from_artic(
     current_user: Korisnik = Depends(get_current_admin)
 ):
     """
-    Kreira sliku iz Art Institute of Chicago API (samo osoblje/admin).
+    Kreira sliku iz Art Institute of Chicago API (samo admin).
     """
     artwork = await artic_service.get_artwork_by_id(artwork_id)
     
@@ -147,7 +147,7 @@ async def update_slika(
     current_user: Korisnik = Depends(get_current_admin)
 ):
     """
-    Ažurira sliku (samo osoblje/admin).
+    Ažurira sliku (samo admin).
     """
     slika = db.query(Slika).filter(Slika.id_slika == slika_id).first()
     
@@ -175,7 +175,7 @@ async def delete_slika(
     current_user: Korisnik = Depends(get_current_admin)
 ):
     """
-    Briše sliku (samo osoblje/admin).
+    Briše sliku (samo admin).
     """
     slika = db.query(Slika).filter(Slika.id_slika == slika_id).first()
     

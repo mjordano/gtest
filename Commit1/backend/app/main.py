@@ -55,7 +55,6 @@ app = FastAPI(
     
     ### Tipovi korisnika:
     * **Običan korisnik** - Pregled izložbi i prijava
-    * **Osoblje** - Upravljanje sadržajem
     * **Administrator** - Pun pristup sistemu
     """,
     version="1.0.0",
